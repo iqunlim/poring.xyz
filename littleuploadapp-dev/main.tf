@@ -3,18 +3,17 @@ terraform {
   # With an S3 bucket and a dynamodb table created, you can utilize this feature
   # as the terraform lock for collaborative and CI/CD utilization. 
   # This should also be run within the module backend-setup so that it has different tfstate files!
-  /*backend "s3" {
+  backend "s3" {
     bucket         = "terraform-state-files-172297794992"
-    key            = "littleuploadapp/terraform.tfstate"
+    key            = "littleuploadapp-dev/terraform.tfstate" # Don't forget to change this!
     region         = "us-east-2"
     dynamodb_table = "terraform-state-locking"
     encrypt        = true 
-  }*/
-
+  }
 }
 
 # The main module. Will deploy the entire app for one region.
-module "littleuploadapp-tf" {
+module "littleuploadapp-tf-dev" {
     source = "../littleuploadapp-module"
 
     #TODO: Add vars here
