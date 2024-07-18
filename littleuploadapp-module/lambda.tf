@@ -1,20 +1,20 @@
 data "archive_file" "lambda" {
   type        = "zip"
-  source_file = "./lambda/lambda.py"
-  output_path = "lambda_function_payload.zip"
+  source_file = "${path.module}/lambda/lambda.py"
+  output_path = "${path.module}/lambda/lambda_function_payload.zip"
 }
 
-resource "aws_lambda_function" "test_lambda" {
+resource "aws_lambda_function" "GetSignedS3" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
   filename      = "lambda_function_payload.zip"
-  function_name = "Get-Signed-S3-${var.production ? "Dev" : "Prod"}"
+  function_name = "Get-Signed-S3-${var.production ? "Prod" : "Dev"}"
   role          = aws_iam_role.FileserverLambdaRole.arn
-  # handler       = "index.test"
+  handler       = "lambda_handler"
 
   source_code_hash = data.archive_file.lambda.output_base64sha256
 
-  runtime = "Python 3.12"
+  runtime = "python3.12"
   # Please see ./lambda/lambda.py for what these variables do
   environment {
     variables = {
@@ -22,4 +22,15 @@ resource "aws_lambda_function" "test_lambda" {
       MAX_SIZE = 20
     }
   }
+}
+
+# TODO: Lambda Permission
+resource "aws_lambda_permission" "apigw_lambda" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.GetSignedS3.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  # More: http://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-control-access-using-iam-policies-to-invoke-api.html
+  source_arn = "arn:aws:execute-api:${var.region}:${data.aws_caller_identity.current.account_id}:${aws_api_gateway_rest_api.littleupload_api.id}/*/${aws_api_gateway_method.Sign-S3-GET.http_method}${aws_api_gateway_resource.Sign-S3.path}"
 }

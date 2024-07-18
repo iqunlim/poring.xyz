@@ -37,7 +37,7 @@ resource "aws_s3_bucket" "filebucket" {
     # prevent_destroy pretents this bucket from ever being deleted via terraform.
     # THIS WILL cause an error on terraform destroy if set to true, but if were in production this should be enabled
     lifecycle {
-        prevent_destroy = var.prevent_destroy_of_s3_filebucket
+        prevent_destroy = false
     }
 }
 

@@ -1,11 +1,11 @@
-import boto3 
+import boto3
 import json
 import os
 import random
 import string
 
 def lambda_handler(event, context):
-	MAX_SIZE = int(os.environ.get("MAX_SIZE", 20)) 
+	MAX_SIZE = int(os.environ.get("MAX_SIZE", 20))
 	S3_BUCKET = os.environ.get('S3_BUCKET', '')
 	return_data = {
 		'data':'',
@@ -30,13 +30,13 @@ def lambda_handler(event, context):
 	elif S3_BUCKET == '':
 		return_data['error'] = "The specified target for the file upload does not exist!"
 
-	else:  
+	else:
 		s3 = boto3.client('s3')
 		try:
 			return_data['data'] = s3.generate_presigned_post(
 				Bucket = S3_BUCKET,
 				Key = filenamefull,
-				Fields = { 
+				Fields = {
               		"Content-Type": event['fileType'],
               	},
 				Conditions = [

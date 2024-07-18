@@ -17,7 +17,7 @@ module "littleuploadapp-tf-dev" {
     source = "../littleuploadapp-module"
 
     #TODO: Add vars here
-    region = var.region # Change this to something other than the app region if you wish.
+    region = var.region
     domain = var.domain # For other regions or for a test-prod setup, this should be different as to not cause overlap
     prevent_destroy_of_s3_filebucket = false
 }
