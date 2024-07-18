@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "BasicLambdaExecutionRole" {
             "logs:CreateLogStream",
             "logs:PutLogEvents"
         ]
-        resources = ["arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:/aws/lambda/Get-Signed-S3:*"]
+        resources = ["arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:/aws/lambda/Get-Signed-S3-${var.production ? "Dev" : "Prod"}:*"]
     }
 }
 
