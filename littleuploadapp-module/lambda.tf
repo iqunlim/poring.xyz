@@ -1,16 +1,16 @@
 data "archive_file" "lambda" {
   type        = "zip"
-  source_file = "${path.module}/lambda/lambda.py"
+  source_file = "${path.module}/lambda/lambda_function.py"
   output_path = "${path.module}/lambda/lambda_function_payload.zip"
 }
 
 resource "aws_lambda_function" "GetSignedS3" {
   # If the file is not in the current working directory you will need to include a
   # path.module in the filename.
-  filename      = "lambda_function_payload.zip"
+  filename      = "${path.module}/lambda/lambda_function_payload.zip"
   function_name = "Get-Signed-S3-${var.production ? "Prod" : "Dev"}"
   role          = aws_iam_role.FileserverLambdaRole.arn
-  handler       = "lambda_handler"
+  handler       = "lambda_function.lambda_handler"
 
   source_code_hash = data.archive_file.lambda.output_base64sha256
 
@@ -24,7 +24,7 @@ resource "aws_lambda_function" "GetSignedS3" {
   }
 }
 
-# TODO: Lambda Permission
+# API Gateway attachment
 resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"

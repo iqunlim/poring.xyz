@@ -28,8 +28,8 @@ resource "aws_api_gateway_method" "Sign-S3-GET" {
 resource "aws_api_gateway_integration" "Sign-S3-Lambda" {
     rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
     resource_id = aws_api_gateway_resource.Sign-S3.id
-    http_method = aws_api_gateway_method.Sign-S3-GET.http_method
-    integration_http_method = "POST"
+    http_method = "${aws_api_gateway_method.Sign-S3-GET.http_method}"
+    integration_http_method = "GET"
     type = "AWS" # TODO: Look in to AWS_PROXY integration request setting
     uri = aws_lambda_function.GetSignedS3.invoke_arn
 }
@@ -60,10 +60,13 @@ resource "aws_api_gateway_integration_response" "Sign-S3-Lambda" {
     resource_id = aws_api_gateway_resource.Sign-S3.id
     http_method = aws_api_gateway_method.Sign-S3-GET.http_method
 
-    response_parameters = {
-        "method.response.header.Access-Control-Allow-Origin":"*"
-    }
+    /*response_parameters = {
+        "method.response.header.Access-Control-Allow-Origin":"['*']"
+    }*/
     status_code = aws_api_gateway_method_response.get_response_200.status_code
+    depends_on = [
+        aws_api_gateway_integration.Sign-S3-Lambda
+    ]
 }
 # This returns the CORS headers
 resource "aws_api_gateway_method" "Sign-S3-OPTIONS" {
@@ -74,7 +77,7 @@ resource "aws_api_gateway_method" "Sign-S3-OPTIONS" {
 }
 
 # This is the integration response with it for the CORS headers
-resource "aws_api_gateway_integration_response" "Sign-S3-Options" {
+/*resource "aws_api_gateway_integration_response" "Sign-S3-Options" {
     rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
     resource_id = aws_api_gateway_resource.Sign-S3.id
     http_method = aws_api_gateway_method.Sign-S3-OPTIONS.http_method
@@ -82,7 +85,11 @@ resource "aws_api_gateway_integration_response" "Sign-S3-Options" {
     response_parameters = {
         "method.response.header.Access-Control-Allow-Headers":"Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"
         "method.response.header.Access-Control-Allow-Methods":"GET,OPTIONS"
-        "method.response.header.Access-Control-Allow-Origin":"*"
+        "method.response.header.Access-Control-Allow-Origin":["*"]
     }
     status_code = aws_api_gateway_method_response.options_response_200.status_code
-}
+
+    depends_on = [
+        aws_api_gateway_integration.Sign-S3-Lambda
+    ]
+}*/
