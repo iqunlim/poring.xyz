@@ -5,6 +5,10 @@ resource "aws_api_gateway_rest_api" "littleupload_api" {
     endpoint_configuration {
         types = ["REGIONAL"]
     }
+
+    tags = {
+        Terraform = "True"
+    }
 }
 
 # This creates /sign-s3 as a url on the API
@@ -45,7 +49,7 @@ resource "aws_api_gateway_integration" "Sign-S3-Lambda" {
     depends_on = [
         aws_api_gateway_method.Sign-S3-GET
     ]
-
+    # This is here to map query parameters to the event dictionary in the python lambda
     request_templates = {
         "application/json" = <<EOF
 {
@@ -69,7 +73,8 @@ resource "aws_api_gateway_integration_response" "Sign-S3-Lambda" {
     status_code = aws_api_gateway_method_response.get_response_200.status_code
     depends_on = [
         aws_api_gateway_method.Sign-S3-GET,
-        aws_api_gateway_integration.Sign-S3-Lambda
+        aws_api_gateway_integration.Sign-S3-Lambda,
+        aws_api_gateway_method_response.get_response_200
     ]
 }
 
@@ -81,6 +86,10 @@ resource "aws_api_gateway_method_response" "get_response_200" {
     depends_on = [
         aws_api_gateway_method.Sign-S3-GET
     ]
+    #TODO: Is this really necessary here? It's in the prototype...
+    response_parameters = {
+        "method.response.header.Access-Control-Allow-Origin" = true
+    }
 }
 
 # THE OPTIONS RESPONSE
@@ -104,7 +113,7 @@ resource "aws_api_gateway_integration_response" "Sign-S3-Options" {
     rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
     resource_id = aws_api_gateway_resource.Sign-S3.id
     http_method = aws_api_gateway_method.Sign-S3-OPTIONS.http_method
-
+    # DO NOT FORGET THAT ALL OF THESE MUST BE IN THE RESPONSE_METHOD AS WELL
     response_parameters = {
         "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
@@ -123,6 +132,7 @@ resource "aws_api_gateway_method_response" "options_response_200" {
     resource_id = aws_api_gateway_resource.Sign-S3.id
     http_method = aws_api_gateway_method.Sign-S3-OPTIONS.http_method
     status_code = "200"
+    # They must be here! And they must be set to true or the creation of the API will fail.
     response_parameters = {
         "method.response.header.Access-Control-Allow-Headers" = true
         "method.response.header.Access-Control-Allow-Methods" = true
@@ -131,4 +141,27 @@ resource "aws_api_gateway_method_response" "options_response_200" {
     response_models = {
         "application/json" = "Empty"
     }
+}
+
+# Deploy! 
+resource "aws_api_gateway_deployment" "api-deployment" {
+  rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
+  #TODO: Learn what's going on here. For now it seems to work.
+  triggers = {
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.littleupload_api.id))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_api_gateway_stage" "current_stage" {
+  deployment_id = aws_api_gateway_deployment.api-deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.littleupload_api.id
+  stage_name    = "v1"
+
+  tags = {
+    Terraform = "True"
+  }
 }

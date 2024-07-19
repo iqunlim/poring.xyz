@@ -21,3 +21,8 @@ module "littleuploadapp-tf-dev" {
     domain = var.domain # For other regions or for a test-prod setup, this should be different as to not cause overlap
     prevent_destroy_of_s3_filebucket = false
 }
+
+output "api_invoke_url" {
+    description = "The base URL to send all API requests to"
+    value = module.littleuploadapp-tf-dev.api_invoke_url
+}
