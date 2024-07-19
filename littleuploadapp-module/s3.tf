@@ -78,3 +78,13 @@ resource "aws_s3_bucket_cors_configuration" "filesrever-cors" {
         allowed_origins = ["*"]
     }
 }
+
+# Finally, set this site as a static website
+# This will allow it to act as a fileserver
+resource "aws_s3_bucket_website_configuration" "example" {
+  bucket = aws_s3_bucket.filebucket.id
+
+  index_document {
+    suffix = "index.html"
+  }
+}
