@@ -29,9 +29,9 @@ data "aws_iam_policy_document" "filebucket-bucket-policy" {
 }
 
 resource "aws_s3_bucket" "filebucket" {
-    bucket = "${var.domain}"
+    bucket = "${var.fs_domain}"
     tags = {
-        Name      = "${var.domain}"
+        Name      = "${var.fs_domain}"
         Terraform = "True"
     }
     # prevent_destroy pretents this bucket from ever being deleted via terraform.
@@ -65,7 +65,7 @@ resource "aws_s3_bucket_cors_configuration" "filesrever-cors" {
     cors_rule {
         allowed_headers = ["*"]
         allowed_methods = ["PUT", "POST"]
-        allowed_origins = ["${var.domain}"]
+        allowed_origins = ["${var.fs_domain}"]
         expose_headers  = [
             "x-amz-server-side-encryption",
             "x-amz-request-id",
@@ -81,7 +81,7 @@ resource "aws_s3_bucket_cors_configuration" "filesrever-cors" {
 
 # Finally, set this site as a static website
 # This will allow it to act as a fileserver
-resource "aws_s3_bucket_website_configuration" "example" {
+resource "aws_s3_bucket_website_configuration" "static-s3-fileserver" {
   bucket = aws_s3_bucket.filebucket.id
 
   index_document {

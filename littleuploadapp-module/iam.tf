@@ -67,4 +67,3 @@ resource "aws_iam_role" "FileserverLambdaRole" {
         Terraform = "True"
     }
 }
-

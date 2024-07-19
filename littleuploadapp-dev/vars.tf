@@ -4,7 +4,12 @@ variable "region" {
   default     = "us-east-2"
 }
 
-variable "domain" {
-  description = "The domain that will act as the fileserver and website all-in-one"
+variable "root_domain" {
+  description = "The domain that will act as the website and root domain"
+  type = string
+}
+
+variable "fs_domain" {
+  description = "The file server domain name or subdomain (include the whole thing)"
   type = string
 }

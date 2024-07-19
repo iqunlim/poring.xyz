@@ -14,8 +14,13 @@ variable "api_interface_endpoint" {
     default     = false
 }
 
-variable "domain" {
-  description = "The domain that will act as the fileserver and website all-in-one"
+variable "fs_domain" {
+  description = "The domain or subdomain that will act as the fileserver"
+  type = string
+}
+
+variable "root_domain" {
+  description = "The root domain, var.domain is the fileserver domain"
   type = string
 }
 

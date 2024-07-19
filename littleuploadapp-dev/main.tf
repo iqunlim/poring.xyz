@@ -18,11 +18,17 @@ module "littleuploadapp-tf-dev" {
 
     #TODO: Add vars here
     region = var.region
-    domain = var.domain # For other regions or for a test-prod setup, this should be different as to not cause overlap
+    root_domain = var.root_domain 
+    fs_domain = var.fs_domain
     prevent_destroy_of_s3_filebucket = false
 }
 
 output "api_invoke_url" {
     description = "The base URL to send all API requests to"
     value = module.littleuploadapp-tf-dev.api_invoke_url
+}
+
+output "s3_static_domain_url" {
+    description = "This URL will attach to var.domain on cloudflare"
+    value = module.littleuploadapp-tf-dev.s3_static_domain_url
 }

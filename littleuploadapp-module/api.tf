@@ -165,3 +165,14 @@ resource "aws_api_gateway_stage" "current_stage" {
     Terraform = "True"
   }
 }
+# Map the API to api.<domain>. the call domain will now be api.<domain>/sign-s3? for example with no /v1/
+resource "aws_api_gateway_domain_name" "api_gateway_domain" {
+    domain_name = "api.${var.root_domain}"
+    certificate_arn = data.aws_acm_certificate.api_certificate.arn
+}
+
+resource "aws_api_gateway_base_path_mapping" "api_map" {
+    api_id = aws_api_gateway_rest_api.littleupload_api.id
+    stage_name = aws_api_gateway_stage.current_stage.stage_name
+    domain_name = aws_api_gateway_domain_name.api_gateway_domain.domain_name
+}
