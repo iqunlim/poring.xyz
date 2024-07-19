@@ -27,6 +27,7 @@ resource "aws_api_gateway_method" "Sign-S3-GET" {
         "method.request.querystring.fileName" = true
         "method.request.querystring.fileType" = true
         "method.request.querystring.t" = true
+        "method.request.path.proxy" = true
     }
 }
 
@@ -61,9 +62,10 @@ resource "aws_api_gateway_integration_response" "Sign-S3-Lambda" {
     resource_id = aws_api_gateway_resource.Sign-S3.id
     http_method = aws_api_gateway_method.Sign-S3-GET.http_method
 
-    /*response_parameters = {
-        "method.response.header.Access-Control-Allow-Origin":"['*']"
-    }*/
+    response_parameters = {
+        "method.response.header.Access-Control-Allow-Origin" = "'*'"
+    }
+    
     status_code = aws_api_gateway_method_response.get_response_200.status_code
     depends_on = [
         aws_api_gateway_method.Sign-S3-GET,
@@ -82,28 +84,37 @@ resource "aws_api_gateway_method_response" "get_response_200" {
 }
 
 # THE OPTIONS RESPONSE
-/*resource "aws_api_gateway_method" "Sign-S3-OPTIONS" {
+resource "aws_api_gateway_method" "Sign-S3-OPTIONS" {
     rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
     resource_id = aws_api_gateway_resource.Sign-S3.id
     http_method = "OPTIONS"
     authorization = "NONE" # TODO: Add authorization to the API
-}*/
+}
+
+resource "aws_api_gateway_integration" "Sign-S3-Options" {
+    rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
+    resource_id = aws_api_gateway_resource.Sign-S3.id
+    http_method = aws_api_gateway_method.Sign-S3-OPTIONS.http_method
+    integration_http_method = "OPTIONS"
+    type = "MOCK"
+}
 
 # This is the integration response with it for the CORS headers
-/*resource "aws_api_gateway_integration_response" "Sign-S3-Options" {
+resource "aws_api_gateway_integration_response" "Sign-S3-Options" {
     rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
     resource_id = aws_api_gateway_resource.Sign-S3.id
     http_method = aws_api_gateway_method.Sign-S3-OPTIONS.http_method
 
     response_parameters = {
-        "method.response.header.Access-Control-Allow-Headers":"Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token"
-        "method.response.header.Access-Control-Allow-Methods":"GET,OPTIONS"
-        "method.response.header.Access-Control-Allow-Origin":["*"]
+        "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
+        "method.response.header.Access-Control-Allow-Origin" = "'*'"
     }
     status_code = aws_api_gateway_method_response.options_response_200.status_code
 
     depends_on = [
-        aws_api_gateway_integration.Sign-S3-Lambda
+        aws_api_gateway_integration.Sign-S3-Options, 
+        aws_api_gateway_method_response.options_response_200
     ]
 }
 
@@ -113,9 +124,11 @@ resource "aws_api_gateway_method_response" "options_response_200" {
     http_method = aws_api_gateway_method.Sign-S3-OPTIONS.http_method
     status_code = "200"
     response_parameters = {
-        
+        "method.response.header.Access-Control-Allow-Headers" = true
+        "method.response.header.Access-Control-Allow-Methods" = true
+        "method.response.header.Access-Control-Allow-Origin" = true
+    }
+    response_models = {
+        "application/json" = "Empty"
     }
 }
-
-
-*/
