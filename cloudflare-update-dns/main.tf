@@ -12,19 +12,19 @@ provider "cloudflare" {
 }
 
 data "cloudflare_zone" "main" {
-  name = var.domain
+  name = var.root_domain
 }
 
-/*resource "cloudflare_record" "api" {
+resource "cloudflare_record" "api" {
   zone_id = data.cloudflare_zone.main.zone_id
-  name    = var.api_subdomain
+  name    = "api.${root_domain}"
   type    = "CNAME"
   value   = var.api_domain_value
   proxied = true
-}*/
+}
 resource "cloudflare_record" "webhost" {
   zone_id = data.cloudflare_zone.main.zone_id
-  name = var.webserver_subdomain
+  name = var.root_domain
   type = "CNAME"
   value = var.webserver_domain_value
   proxied = true

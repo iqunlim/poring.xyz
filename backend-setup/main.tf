@@ -37,3 +37,5 @@ resource "aws_dynamodb_table" "terraform_locks" {
   }
 }
 
+# TODO: Set up the ACM certificate that will be used by data in the module
+# "api.${var.root_domain}"
