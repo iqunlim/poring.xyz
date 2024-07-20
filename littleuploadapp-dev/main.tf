@@ -17,18 +17,18 @@ module "littleuploadapp-tf-dev" {
     source = "../littleuploadapp-module"
 
     #TODO: Add vars here
-    region = var.region
-    root_domain = var.root_domain 
-    fs_domain = var.fs_domain
+    region = "us-east-2"
+    root_domain = "iqun.xyz"
+    fs_domain = "test.iqun.xyz"
     prevent_destroy_of_s3_filebucket = false
 }
 
-output "api_invoke_url" {
-    description = "The base URL to send all API requests to"
-    value = module.littleuploadapp-tf-dev.api_invoke_url
-}
+module "cloudflare_setup" {
 
-output "s3_static_domain_url" {
-    description = "This URL will attach to var.domain on cloudflare"
-    value = module.littleuploadapp-tf-dev.s3_static_domain_url
+  source = "../cloudflare-update-dns"
+  cloudflare_api_token = "" #TODO: make this a variable and put it in tfvars 
+  root_domain = "iqun.xyz" # This will be extrapolated in to api.<root_domain>
+  api_domain_value = module.littleuploadapp-tf-dev.api_domain_url
+  webserver_domain_value = module.littleuploadapp-tf-dev.webserver_domain_url
+  fileserver_domain_value = module.littleuploadapp-tf-dev.s3_static_domain_url
 }

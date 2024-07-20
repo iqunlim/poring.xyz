@@ -6,7 +6,7 @@
 resource "aws_vpc" "littleupload-vpc" {
   cidr_block       = "10.0.0.0/16"
   instance_tenancy = "default" # This may be set with dedicated if required
-
+  enable_dns_hostnames = true
   tags = {
     Name      = "littleupload-vpc"
     Terraform = "True"
