@@ -39,4 +39,4 @@ override.tf.json
 terraform.rc
 
 # User-defined ignores go here
-littleuploadapp-module/lambda/lambda_function_payload.zip
+*.zip
