@@ -16,19 +16,17 @@ terraform {
 module "littleuploadapp-tf-dev" {
     source = "../littleuploadapp-module"
 
-    #TODO: Add vars here
     region = "us-east-2"
-    root_domain = "iqun.xyz"
-    fs_domain = "test.iqun.xyz"
+    root_domain = var.root_domain
     prevent_destroy_of_s3_filebucket = false
 }
 
-module "cloudflare_setup" {
-
+/*module "cloudflare_setup" {
   source = "../cloudflare-update-dns"
-  cloudflare_api_token = "" #TODO: make this a variable and put it in tfvars 
-  root_domain = "iqun.xyz" # This will be extrapolated in to api.<root_domain>
-  api_domain_value = module.littleuploadapp-tf-dev.api_domain_url
-  webserver_domain_value = module.littleuploadapp-tf-dev.webserver_domain_url
-  fileserver_domain_value = module.littleuploadapp-tf-dev.s3_static_domain_url
-}
+
+  cloudflare_api_token = var.cloudflare_api_key
+  root_domain = var.root_domain
+  api_domain_value = module.littleuploadapp-tf-dev.api_domain_url # api.<root_domain>
+  webserver_domain_value = module.littleuploadapp-tf-dev.webserver_domain_ip # <root_domain>
+  fileserver_domain_value = module.littleuploadapp-tf-dev.s3_static_domain_url # files.<root_domain>
+}*/

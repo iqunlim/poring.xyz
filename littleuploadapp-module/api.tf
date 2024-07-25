@@ -123,7 +123,6 @@ resource "aws_api_gateway_integration_response" "Sign-S3-Options" {
 
     depends_on = [
         aws_api_gateway_integration.Sign-S3-Options, 
-        aws_api_gateway_method_response.options_response_200
     ]
 }
 
@@ -143,19 +142,6 @@ resource "aws_api_gateway_method_response" "options_response_200" {
     }
 }
 
-# Deploy! 
-resource "aws_api_gateway_deployment" "api-deployment" {
-  rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
-  #TODO: Learn what's going on here. For now it seems to work.
-  triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.littleupload_api.id))
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_api_gateway_stage" "current_stage" {
   deployment_id = aws_api_gateway_deployment.api-deployment.id
   rest_api_id   = aws_api_gateway_rest_api.littleupload_api.id
@@ -165,10 +151,36 @@ resource "aws_api_gateway_stage" "current_stage" {
     Terraform = "True"
   }
 }
+
+# Deploy! 
+resource "aws_api_gateway_deployment" "api-deployment" {
+  rest_api_id = aws_api_gateway_rest_api.littleupload_api.id
+  #TODO: Learn what's going on here. For now it seems to work.
+  triggers = {
+    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.littleupload_api.id))
+  }
+  # All of these dependencies are required or else the deployment will fail with an error that it doesn't exist
+  depends_on = [
+    aws_api_gateway_method.Sign-S3-GET,
+    aws_api_gateway_method.Sign-S3-OPTIONS,
+    aws_api_gateway_integration.Sign-S3-Lambda,
+    aws_api_gateway_integration.Sign-S3-Options,
+    aws_api_gateway_integration_response.Sign-S3-Lambda,
+    aws_api_gateway_integration_response.Sign-S3-Options,
+    aws_api_gateway_method_response.get_response_200,
+    aws_api_gateway_method_response.options_response_200
+  ]
+
+}
+
 # Map the API to api.<domain>. the call domain will now be api.<domain>/sign-s3? for example with no /v1/
 resource "aws_api_gateway_domain_name" "api_gateway_domain" {
     domain_name = "api.${var.root_domain}"
-    certificate_arn = data.aws_acm_certificate.api_certificate.arn
+    regional_certificate_arn = data.aws_acm_certificate.api_certificate.arn
+
+    endpoint_configuration {
+        types = ["REGIONAL"]
+    }
 }
 
 resource "aws_api_gateway_base_path_mapping" "api_map" {

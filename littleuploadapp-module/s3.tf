@@ -29,11 +29,13 @@ data "aws_iam_policy_document" "filebucket-bucket-policy" {
 }
 
 resource "aws_s3_bucket" "filebucket" {
-    bucket = "${var.fs_domain}"
+    bucket = "files.${var.root_domain}"
+    
     tags = {
-        Name      = "${var.fs_domain}"
+        Name      = "files.${var.root_domain}"
         Terraform = "True"
     }
+    force_destroy = true
     # prevent_destroy pretents this bucket from ever being deleted via terraform.
     # THIS WILL cause an error on terraform destroy if set to true, but if were in production this should be enabled
     lifecycle {
@@ -65,7 +67,7 @@ resource "aws_s3_bucket_cors_configuration" "filesrever-cors" {
     cors_rule {
         allowed_headers = ["*"]
         allowed_methods = ["PUT", "POST"]
-        allowed_origins = ["${var.fs_domain}"]
+        allowed_origins = ["files.${var.root_domain}"]
         expose_headers  = [
             "x-amz-server-side-encryption",
             "x-amz-request-id",

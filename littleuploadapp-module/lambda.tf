@@ -18,7 +18,7 @@ resource "aws_lambda_function" "GetSignedS3" {
   # Please see ./lambda/lambda.py for what these variables do
   environment {
     variables = {
-      S3_BUCKET = var.fs_domain
+      S3_BUCKET = "files.${var.root_domain}"
       MAX_SIZE = 20
     }
   }

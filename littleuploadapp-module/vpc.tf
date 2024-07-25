@@ -37,7 +37,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-# If this needed private subnets, you could copy the above here and not associate them with a route table
+# If this needed private subnets, you could copy the above here and not associate them with a route table with an IGW
 
 # Next, let's set an Internet Gateway for the public subnets
 

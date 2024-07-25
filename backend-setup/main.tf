@@ -39,3 +39,27 @@ resource "aws_dynamodb_table" "terraform_locks" {
 
 # TODO: Set up the ACM certificate that will be used by data in the module
 # "api.${var.root_domain}"
+resource "aws_acm_certificate" "api_certificate" {
+  domain_name = "api.${var.root_domain}"
+  validation_method = "DNS"
+
+  tags = {
+    Terraform = "True"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  validation_option {
+    domain_name = "api.${var.root_domain}"
+    validation_domain = var.root_domain
+  }
+}
+
+# For now, I am going to do the validation manually
+# In the future, this will be a route53 record that will utilize aws_acm_validation
+# OR it will be wired from here in to a cloudflare record automatically
+output "validation_json" {
+  value = aws_acm_certificate.api_certificate.domain_validation_options
+}
