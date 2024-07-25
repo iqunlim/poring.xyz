@@ -18,8 +18,7 @@ module "littleuploadapp-tf-prod" {
 
     region = "us-east-2"
     root_domain = var.root_domain
-    prevent_destroy_of_s3_filebucket = true # currently does nothing
-    production = true
+    prevent_destroy_of_s3_filebucket = false
 }
 
 module "cloudflare_setup" {
@@ -28,6 +27,6 @@ module "cloudflare_setup" {
   cloudflare_api_token = var.cloudflare_api_key
   root_domain = var.root_domain
   api_domain_value = module.littleuploadapp-tf-prod.api_domain_url # api.<root_domain>
-  webserver_domain_value = module.littleuploadapp-tf-prod.webserver_domain_url # <root_domain>
+  webserver_domain_value = module.littleuploadapp-tf-prod.webserver_domain_ip # <root_domain>
   fileserver_domain_value = module.littleuploadapp-tf-prod.s3_static_domain_url # files.<root_domain>
 }
