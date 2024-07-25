@@ -25,7 +25,6 @@ resource "cloudflare_record" "api" {
 resource "cloudflare_record" "webhost" {
   zone_id = data.cloudflare_zone.main.zone_id
   name = "@"
-  # using CNAME for the root domain is only possible with CNAME flattening and cloudflare does it for free!
   type = "A"
   value = var.webserver_domain_value
   proxied = true
