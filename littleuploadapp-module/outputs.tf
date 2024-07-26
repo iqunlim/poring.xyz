@@ -9,7 +9,7 @@ output "s3_static_domain_url" {
     value = trim(aws_s3_bucket_website_configuration.static-s3-fileserver.website_domain, "http://")
 }
 # Subject to change as compute shifts to ECS or whatever else
-output "webserver_domain_ip" {
+output "webserver_domain_url" {
     description = "The URL directly to the webserver instance"
-    value = aws_instance.webserver.public_ip
+    value = aws_lb.web_ecs_load_balancer.dns_name
 }

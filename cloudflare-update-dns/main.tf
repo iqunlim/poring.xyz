@@ -25,7 +25,7 @@ resource "cloudflare_record" "api" {
 resource "cloudflare_record" "webhost" {
   zone_id = data.cloudflare_zone.main.zone_id
   name = "@"
-  type = "A"
+  type = "CNAME"
   value = var.webserver_domain_value
   proxied = true
 }
@@ -37,3 +37,6 @@ resource "cloudflare_record" "fileserver" {
   value = var.fileserver_domain_value
   proxied = true
 }
+
+#TODO: Set SSL to flexible by default 
+# Add Configuration rule: @ == No SSL

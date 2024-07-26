@@ -57,9 +57,32 @@ resource "aws_acm_certificate" "api_certificate" {
   }
 }
 
+resource "aws_acm_certificate" "lb_certificate" {
+  domain_name = "${var.root_domain}"
+  validation_method = "DNS"
+
+  tags = {
+    Terraform = "True"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  validation_option {
+    domain_name = "${var.root_domain}"
+    validation_domain = var.root_domain
+  }
+}
+
+
 # For now, I am going to do the validation manually
 # In the future, this will be a route53 record that will utilize aws_acm_validation
 # OR it will be wired from here in to a cloudflare record automatically
 output "validation_json" {
   value = aws_acm_certificate.api_certificate.domain_validation_options
+}
+
+output "validation_json_root_domain" {
+  value = aws_acm_certificate.lb_certificate.domain_validation_options
 }

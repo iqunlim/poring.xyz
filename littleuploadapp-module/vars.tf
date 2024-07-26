@@ -30,3 +30,8 @@ variable "prevent_destroy_of_s3_filebucket" {
   type = bool 
   default = true
 }
+
+variable "image" {
+  description = "The docker image that will run the webserver"
+  type = string
+}

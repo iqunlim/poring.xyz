@@ -67,7 +67,11 @@ resource "aws_s3_bucket_cors_configuration" "filesrever-cors" {
     cors_rule {
         allowed_headers = ["*"]
         allowed_methods = ["PUT", "POST"]
-        allowed_origins = ["${var.root_domain}"]
+        allowed_origins = [
+            "${var.root_domain}",
+            "https://${var.root_domain}", 
+            "http://${var.root_domain}"
+        ]
         expose_headers  = [
             "x-amz-server-side-encryption",
             "x-amz-request-id",
