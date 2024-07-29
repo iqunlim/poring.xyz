@@ -1,4 +1,4 @@
-terraform { 
+terraform {
   # YOU MUST RUN backend-setup IN ORDER TO UTILIZE THIS, OTHERWISE IT WILL FAIL
   # With an S3 bucket and a dynamodb table created, you can utilize this feature
   # as the terraform lock for collaborative and CI/CD utilization. 
@@ -8,25 +8,25 @@ terraform {
     key            = "littleuploadapp-prod/terraform.tfstate" # Don't forget to change this!
     region         = "us-east-2"
     dynamodb_table = "terraform-state-locking"
-    encrypt        = true 
+    encrypt        = true
   }
 }
 
 # The main module. Will deploy the entire app for one region.
 module "littleuploadapp-tf-prod" {
-    source = "../littleuploadapp-module"
+  source = "../littleuploadapp-module"
 
-    region = "us-east-2"
-    root_domain = var.root_domain
-    prevent_destroy_of_s3_filebucket = false
+  region                           = "us-east-2"
+  root_domain                      = var.root_domain
+  prevent_destroy_of_s3_filebucket = false
 }
 
 module "cloudflare_setup" {
   source = "../cloudflare-update-dns"
 
-  cloudflare_api_token = var.cloudflare_api_key
-  root_domain = var.root_domain
-  api_domain_value = module.littleuploadapp-tf-prod.api_domain_url # api.<root_domain>
-  webserver_domain_value = module.littleuploadapp-tf-prod.webserver_domain_ip # <root_domain>
+  cloudflare_api_token    = var.cloudflare_api_key
+  root_domain             = var.root_domain
+  api_domain_value        = module.littleuploadapp-tf-prod.api_domain_url       # api.<root_domain>
+  webserver_domain_value  = module.littleuploadapp-tf-prod.webserver_domain_ip  # <root_domain>
   fileserver_domain_value = module.littleuploadapp-tf-prod.s3_static_domain_url # files.<root_domain>
 }

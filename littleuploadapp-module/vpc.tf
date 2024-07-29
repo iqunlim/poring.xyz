@@ -4,8 +4,8 @@
 # Main Resource
 
 resource "aws_vpc" "littleupload-vpc" {
-  cidr_block       = "10.0.0.0/16"
-  instance_tenancy = "default" # This may be set with dedicated if required
+  cidr_block           = "10.0.0.0/16"
+  instance_tenancy     = "default" # This may be set with dedicated if required
   enable_dns_hostnames = true
   tags = {
     Name      = "littleupload-vpc"
@@ -72,8 +72,8 @@ resource "aws_route_table" "MAIN" {
 
 resource "aws_route_table_association" "public-1" {
 
-  count = length(aws_subnet.public) 
-  subnet_id = aws_subnet.public[count.index].id
+  count          = length(aws_subnet.public)
+  subnet_id      = aws_subnet.public[count.index].id
   route_table_id = aws_route_table.MAIN.id
 
 }
@@ -84,23 +84,23 @@ resource "aws_route_table_association" "public-1" {
 
 # S3 Gateway endpoint to connect to S3 buckets within the VPC and not have to go to the internet
 resource "aws_vpc_endpoint" "s3" {
-    vpc_id = aws_vpc.littleupload-vpc.id
-    service_name = "com.amazonaws.${var.region}.s3"
-    route_table_ids = [aws_route_table.MAIN.id]
-    tags = {
-        Name = "S3-Endpoint"
-        Terraform = "True"
-    }
+  vpc_id          = aws_vpc.littleupload-vpc.id
+  service_name    = "com.amazonaws.${var.region}.s3"
+  route_table_ids = [aws_route_table.MAIN.id]
+  tags = {
+    Name      = "S3-Endpoint"
+    Terraform = "True"
+  }
 }
 
 # API Interface Endpoint here. These cost $7.20/month($0.01/hr) PER SUBNET/AZ!!!! to maintain 
 #     compared to the free Gateway Endponts of dynamodb and S3
 # You must set "api_interface_endpoint=true in the module to utilize this"
 resource "aws_vpc_endpoint" "api_gateway" {
-    count = var.api_interface_endpoint ? 1 : 0 # Format of [boolean value] ? [do if true] : [do if false]
-    vpc_id = aws_vpc.littleupload-vpc.id
-    service_name = "com.amazonaws.us-east-2.execute-api"
-    vpc_endpoint_type = "Interface"
-    # It is VERY likely that I will only associate this to one subnet, but for the example ill attach it to all 3
-    subnet_ids = aws_subnet.public.*.id # You can use the * to get a string array of all IDs. Very handy.
+  count             = var.api_interface_endpoint ? 1 : 0 # Format of [boolean value] ? [do if true] : [do if false]
+  vpc_id            = aws_vpc.littleupload-vpc.id
+  service_name      = "com.amazonaws.us-east-2.execute-api"
+  vpc_endpoint_type = "Interface"
+  # It is VERY likely that I will only associate this to one subnet, but for the example ill attach it to all 3
+  subnet_ids = aws_subnet.public.*.id # You can use the * to get a string array of all IDs. Very handy.
 }

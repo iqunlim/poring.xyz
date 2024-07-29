@@ -6,10 +6,10 @@ variable "region" {
 
 variable "tflock-bucket-name" {
   description = "This will be the name of the bucket where the lock files for collaboration exist"
-  type = string 
+  type        = string
 }
 
 variable "root_domain" {
   description = "the root for the domain for the app"
-  type = string
+  type        = string
 }

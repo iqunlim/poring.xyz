@@ -40,7 +40,7 @@ resource "aws_dynamodb_table" "terraform_locks" {
 # TODO: Set up the ACM certificate that will be used by data in the module
 # "api.${var.root_domain}"
 resource "aws_acm_certificate" "api_certificate" {
-  domain_name = "api.${var.root_domain}"
+  domain_name       = "api.${var.root_domain}"
   validation_method = "DNS"
 
   tags = {
@@ -52,13 +52,13 @@ resource "aws_acm_certificate" "api_certificate" {
   }
 
   validation_option {
-    domain_name = "api.${var.root_domain}"
+    domain_name       = "api.${var.root_domain}"
     validation_domain = var.root_domain
   }
 }
 
 resource "aws_acm_certificate" "lb_certificate" {
-  domain_name = "${var.root_domain}"
+  domain_name       = var.root_domain
   validation_method = "DNS"
 
   tags = {
@@ -70,7 +70,7 @@ resource "aws_acm_certificate" "lb_certificate" {
   }
 
   validation_option {
-    domain_name = "${var.root_domain}"
+    domain_name       = var.root_domain
     validation_domain = var.root_domain
   }
 }

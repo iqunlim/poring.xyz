@@ -1,41 +1,41 @@
 resource "aws_ecs_cluster" "webserver_cluster" {
-    name = "littleupload-webserver-cluster"
+  name = "littleupload-webserver-cluster"
 
-    setting {
-        name = "containerInsights"
-        value = "enabled"
-    }
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 resource "aws_ecs_service" "web_service" {
-  name = "web_service"
-  cluster = aws_ecs_cluster.webserver_cluster.id
-  task_definition = aws_ecs_task_definition.webserver.arn
-  desired_count = 3
-  launch_type = "FARGATE"
-  #force_new_deployment = true this is for when i want to push updates
-  platform_version = "1.4.0" # VERIFY
+  name                 = "web_service"
+  cluster              = aws_ecs_cluster.webserver_cluster.id
+  task_definition      = aws_ecs_task_definition.webserver.arn
+  desired_count        = 3
+  launch_type          = "FARGATE"
+  force_new_deployment = true
+  platform_version     = "1.4.0" # VERIFY
 
   lifecycle {
     ignore_changes = [desired_count]
   }
 
   network_configuration {
-    subnets = [for subnet in aws_subnet.public: subnet.id]
-    security_groups = [aws_security_group.ecs.id]
+    subnets          = [for subnet in aws_subnet.public : subnet.id]
+    security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = true
   }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.ecs_target.arn
-    container_name = "webserver"
-    container_port = 5000
+    container_name   = "webserver"
+    container_port   = 5000
   }
 }
 
 resource "aws_ecs_task_definition" "webserver" {
-  family = "webserver"
-  container_definitions = <<TASK_DEFINITION
+  family                = "webserver"
+  container_definitions = <<EOF
 [
   {
     "portMappings": [
@@ -71,13 +71,13 @@ resource "aws_ecs_task_definition" "webserver" {
     "name": "webserver"
   }
 ]
-TASK_DEFINITION
+EOF
 
-  network_mode = "awsvpc"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  memory = "1024"
-  cpu = "512"
-  execution_role_arn = aws_iam_role.ecs_role.arn
+  memory                   = "1024"
+  cpu                      = "512"
+  execution_role_arn       = aws_iam_role.ecs_role.arn
 
   tags = {
     Terraform = "True"
@@ -97,8 +97,8 @@ TASK_DEFINITION
 
 
 resource "aws_security_group" "ecs" {
-    name = "webapp-ecs-security-group"
-    vpc_id = aws_vpc.littleupload-vpc.id
+  name   = "webapp-ecs-security-group"
+  vpc_id = aws_vpc.littleupload-vpc.id
 }
 
 resource "aws_security_group_rule" "allow_flask_port" {
@@ -163,7 +163,7 @@ resource "aws_security_group_rule" "allow_alb_all_outbound" {
 resource "aws_lb" "web_ecs_load_balancer" {
   name               = "web-app-lb"
   load_balancer_type = "application"
-  subnets            = [for subnet in aws_subnet.public: subnet.id]
+  subnets            = [for subnet in aws_subnet.public : subnet.id]
   security_groups    = [aws_security_group.elb.id]
   # internal = true switch when refactored to have no public IP addresses
 }
@@ -192,16 +192,16 @@ resource "aws_lb_listener" "https" {
   certificate_arn   = data.aws_acm_certificate.lb_certificate.arn
 
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.ecs_target.arn
   }
 }
 
 resource "aws_lb_target_group" "ecs_target" {
-  name     = "ecs-target"
-  port     = 5000
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.littleupload-vpc.id
+  name        = "ecs-target"
+  port        = 5000
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.littleupload-vpc.id
   target_type = "ip"
 
   health_check {
@@ -220,11 +220,11 @@ resource "aws_lb_target_group" "ecs_target" {
 }
 
 resource "aws_appautoscaling_target" "to_containers" {
-    max_capacity = 6
-    min_capacity = 3
-    resource_id = "service/${aws_ecs_cluster.webserver_cluster.name}/${aws_ecs_service.web_service.name}"
-    scalable_dimension = "ecs:service:DesiredCount"
-    service_namespace = "ecs"
+  max_capacity       = 6
+  min_capacity       = 3
+  resource_id        = "service/${aws_ecs_cluster.webserver_cluster.name}/${aws_ecs_service.web_service.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
 }
 # Stolen shamelessly as some cookie-cutter policies 60% CPU 80% Memory
 resource "aws_appautoscaling_policy" "memory_for_webcluster" {
@@ -239,16 +239,16 @@ resource "aws_appautoscaling_policy" "memory_for_webcluster" {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
 
-    target_value       = 80
+    target_value = 80
   }
 }
 
 resource "aws_appautoscaling_policy" "cpu_for_webcluster" {
-  name = "cpu_for_webcluster"
-  policy_type = "TargetTrackingScaling"
-  resource_id = aws_appautoscaling_target.to_containers.resource_id
+  name               = "cpu_for_webcluster"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.to_containers.resource_id
   scalable_dimension = aws_appautoscaling_target.to_containers.scalable_dimension
-  service_namespace = aws_appautoscaling_target.to_containers.service_namespace
+  service_namespace  = aws_appautoscaling_target.to_containers.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {

@@ -19,7 +19,7 @@ resource "aws_lambda_function" "GetSignedS3" {
   environment {
     variables = {
       S3_BUCKET = "files.${var.root_domain}"
-      MAX_SIZE = 20
+      MAX_SIZE  = 20
     }
   }
 }
