@@ -22,6 +22,7 @@ resource "cloudflare_record" "api" {
   value   = var.api_domain_value
   proxied = false
 }
+
 resource "cloudflare_record" "webhost" {
   zone_id = data.cloudflare_zone.main.zone_id
   name    = "@"
@@ -51,7 +52,7 @@ resource "cloudflare_ruleset" "set_no_ssl" {
       ssl = "off"
     }
     expression  = "(http.host eq \"poring.xyz\")"
-    description = "Disable flexible ssl for the root domain as it is signed by aws"
+    description = "Disable flexible ssl for the root domain, AWS KMS managed"
     enabled     = true
   }
 }

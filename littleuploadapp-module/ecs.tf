@@ -14,7 +14,7 @@ resource "aws_ecs_service" "web_service" {
   desired_count        = 3
   launch_type          = "FARGATE"
   force_new_deployment = true
-  platform_version     = "1.4.0" # VERIFY
+  platform_version     = "1.4.0"
 
   lifecycle {
     ignore_changes = [desired_count]
@@ -226,7 +226,7 @@ resource "aws_appautoscaling_target" "to_containers" {
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
-# Stolen shamelessly as some cookie-cutter policies 60% CPU 80% Memory
+
 resource "aws_appautoscaling_policy" "memory_for_webcluster" {
   name               = "memory_for_webcluster"
   policy_type        = "TargetTrackingScaling"

@@ -3,6 +3,9 @@ terraform {
   # With an S3 bucket and a dynamodb table created, you can utilize this feature
   # as the terraform lock for collaborative and CI/CD utilization. 
   # This should also be run within the module backend-setup so that it has different tfstate files!
+
+  required_version = "~> 1.9.4"
+
   backend "s3" {
     bucket         = "terraform-state-files-172297794992"
     key            = "littleuploadapp-dev/terraform.tfstate" # Don't forget to change this!
@@ -31,3 +34,4 @@ module "cloudflare_setup" {
   webserver_domain_value  = module.littleuploadapp-tf-dev.webserver_domain_url # <root_domain>
   fileserver_domain_value = module.littleuploadapp-tf-dev.s3_static_domain_url # files.<root_domain>
 }
+
