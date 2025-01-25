@@ -1,0 +1,24 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+
+.file-upload label {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+label.blog-img-upload {
+    background-color: inherit;
+    border: solid 1px #94a3b8;
+    width: fit-content;
+    color: white;
+    padding: 10px 20px;
+    font-family: sans-serif;
+    border-radius: 50rem;
+    cursor: pointer;
+    margin-top: 1rem;
+}
