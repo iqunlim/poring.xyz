@@ -28,29 +28,27 @@ export const validateApiResponse = (ResponseData: unknown) => {
 
 export async function getSignedS3Url(file: File) {
     const url = `${apiUrl}/v1/sign-s3?fileName=${file.name}&fileType=${file.type}&t=${file.size}`
-    try {
-        const ret = await fetch(url)
-            .then(data => data.json())
-            .then((data) => validateApiResponse(data))
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error)
-                }
-                return data
-            })
-        return ret
-    } catch (err) {
-        //TODO: special logging handlers for each type of error
-        if (err instanceof Error) {
-            console.log("Error getting Signed S3 Url")
-            console.error(err)
-        } else if (err instanceof ZodError) {
-            console.log("Error validating API response")
-            console.error(err)
-        } else {
-            console.error(`Unknown error: ${err}`)
-        }
-    }
+    const ret = await fetch(url)
+        .then(data => data.json())
+        .then((data) => validateApiResponse(data))
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error)
+            }
+            return data
+        }).catch((err) => {
+            //TODO: special logging handlers for each type of error
+            if (err instanceof Error) {
+                console.log("Error getting Signed S3 Url")
+                console.error(err)
+            } else if (err instanceof ZodError) {
+                console.log("Error validating API response")
+                console.error(err)
+            } else {
+                console.error(`Unknown error: ${err}`)
+            }
+        })
+    return ret
 }
 
 export async function putSignedS3Object(file: File, SignedS3Response: ApiData, url: string) {
