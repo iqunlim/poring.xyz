@@ -1,55 +1,63 @@
+import { z, ZodError } from "zod";
+
+//TODO: Explore options to set this on the web server more dynamically.
 const apiUrl = "https://dd0zurzvoj.execute-api.us-east-2.amazonaws.com"
 
+const ApiDataZod = z.object({
+    url: z.string().url(),
+    fields: z.object({
+        "Content-Type": z.string(),
+        key: z.string(),
+        "x-amz-algorithm": z.string(),
+        "x-amz-credential": z.string(),
+        "x-amz-date": z.string(),
+        "x-amz-security-token": z.string(),
+        policy: z.string(),
+        "x-amz-signature": z.string(),
+    }),
+    imageUrl: z.string().url(),
+    error: z.string().optional()
+})
 
-export type APIDataFields = {
-    "Content-Type": string;
-    key: string;
-    "x-amz-algorithm": string;
-    "x-amz-credential": string;
-    "x-amz-date": string;
-    "x-amz-security-token": string;
-    policy: string;
-    "x-amz-signature": string;
+export type ApiData = z.infer<typeof ApiDataZod>
+
+export const validateApiResponse = (ResponseData: unknown) => {
+    const parsedData = ApiDataZod.parse(ResponseData)
+    return parsedData
 }
-
-export type APIData = {
-    url: string;
-    fields: APIDataFields
-}
-
-export interface ApiResponse {
-    data: APIData
-    url: string;
-    error: string;
-}
-
-
-
 
 export async function getSignedS3Url(file: File) {
     const url = `${apiUrl}/v1/sign-s3?fileName=${file.name}&fileType=${file.type}&t=${file.size}`
-
-    const ret = await fetch(url)
-    if (ret.ok) {
+    try {
+        const ret = await fetch(url)
+            .then(data => data.json())
+            .then((data) => validateApiResponse(data))
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error)
+                }
+                return data
+            })
         return ret
-    } else {
-        console.log(ret.status)
-        throw new Error("Bad request")
+    } catch (err) {
+        //TODO: special logging handlers for each type of error
+        if (err instanceof Error) {
+            console.log("Error getting Signed S3 Url")
+            console.error(err)
+        } else if (err instanceof ZodError) {
+            console.log("Error validating API response")
+            console.error(err)
+        } else {
+            console.error(`Unknown error: ${err}`)
+        }
     }
 }
 
-export async function putSignedS3Object(file: File, SignedS3Response: ApiResponse, url: string) {
-    console.log("url:", url)
+export async function putSignedS3Object(file: File, SignedS3Response: ApiData, url: string) {
     const postData = new FormData();
-    const fieldData = SignedS3Response.data.fields
-    for (const key in fieldData) {
-        const val: string = SignedS3Response.data.fields[key as keyof APIDataFields]
-        postData.append(key, val)
-    }
-
+    Object.entries(SignedS3Response.fields).forEach(([key, val]) => {
+        postData.append(key, val as keyof typeof SignedS3Response.fields)
+    })
     postData.append('file', file)
-
-    console.log(postData)
-    const res = await fetch(url, { method: "POST", body: postData })
-    return res
+    return await fetch(url, { method: "POST", body: postData })
 }

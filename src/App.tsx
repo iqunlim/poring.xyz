@@ -1,5 +1,5 @@
 import { useActionState, useRef, useState } from 'react'
-import { ApiResponse, getSignedS3Url, putSignedS3Object } from './Api'
+import { getSignedS3Url, putSignedS3Object } from './Api'
 import './App.css'
 
 
@@ -10,24 +10,19 @@ function App() {
   const [currentFileUrl, setCurrentFileUrl] = useState<string | undefined>();
   const formRef = useRef<HTMLFormElement | null>(null)
 
-  const action = async (previousState: unknown, formData: FormData) => {
-    console.log(previousState)
+  const action = async (_: string | null | undefined, formData: FormData) => {
     const file = formData.get("image") as File
     if (file) {
       const SignedData = await getSignedS3Url(file)
-      const S3Response = await SignedData.json();
-      const ApiRes: ApiResponse = JSON.parse(S3Response)
-      putSignedS3Object(file, ApiRes, ApiRes.data.url).then(() => {
-        setFileNameState(file.name)
-        setCurrentFileUrl(ApiRes.url)
+      if (SignedData) {
+        putSignedS3Object(file, SignedData, SignedData.url).then(() => {
+          setFileNameState(file.name)
+          setCurrentFileUrl(SignedData.imageUrl)
+        })
+        return "Uploaded."
       }
-      )
-      return "Uploaded."
-
     }
-    return "Loading..."
   }
-
   const [actionState, formAction, isPending] = useActionState(action, null)
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +40,7 @@ function App() {
           <label htmlFor="img" className="img-upload">Upload Image</label><span id="img-file-chosen">{fileNameState}</span>
         </div>
       </form>
-      {currentFileUrl && <img src={currentFileUrl} />}
+      {currentFileUrl && <img style={{ maxWidth: "50%", maxHeight: "50%" }} src={currentFileUrl} />}
     </div>
   )
 }
