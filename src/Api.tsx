@@ -27,7 +27,7 @@ const validateApiResponse = (ResponseData: unknown) => {
 }
 
 export async function getSignedS3Url(file: File) {
-    const url = `${apiUrl}/v1/sign-s3?fileName=${file.name}&fileType=${file.type}&t=${file.size}`;
+    const url = `${apiUrl}/v1/sign-s3?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}&t=${file.size}`;
     return fetch(url)
         .then(data => data.json())
         .then(validateApiResponse)
