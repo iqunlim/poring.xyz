@@ -17,45 +17,44 @@ const ApiDataZod = z.object({
     }),
     imageUrl: z.string().url(),
     error: z.string().optional()
-})
+});
 
 export type ApiData = z.infer<typeof ApiDataZod>
 
-export const validateApiResponse = (ResponseData: unknown) => {
-    const parsedData = ApiDataZod.parse(ResponseData)
+const validateApiResponse = (ResponseData: unknown) => {
+    const parsedData = ApiDataZod.parse(ResponseData);
     return parsedData
 }
 
 export async function getSignedS3Url(file: File) {
-    const url = `${apiUrl}/v1/sign-s3?fileName=${file.name}&fileType=${file.type}&t=${file.size}`
-    const ret = await fetch(url)
+    const url = `${apiUrl}/v1/sign-s3?fileName=${file.name}&fileType=${file.type}&t=${file.size}`;
+    return fetch(url)
         .then(data => data.json())
-        .then((data) => validateApiResponse(data))
+        .then(validateApiResponse)
         .then(data => {
             if (data.error) {
-                throw new Error(data.error)
+                throw new Error(data.error);
             }
             return data
         }).catch((err) => {
             //TODO: special logging handlers for each type of error
             if (err instanceof Error) {
-                console.log("Error getting Signed S3 Url")
-                console.error(err)
+                console.log("Error getting Signed S3 Url");
+                console.error(err);
             } else if (err instanceof ZodError) {
-                console.log("Error validating API response")
-                console.error(err)
+                console.log("Error validating API response");
+                console.error(err);
             } else {
-                console.error(`Unknown error: ${err}`)
+                console.error(`Unknown error: ${err}`);
             }
-        })
-    return ret
+        });
 }
 
 export async function putSignedS3Object(file: File, SignedS3Response: ApiData, url: string) {
     const postData = new FormData();
     Object.entries(SignedS3Response.fields).forEach(([key, val]) => {
-        postData.append(key, val as keyof typeof SignedS3Response.fields)
+        postData.append(key, val as keyof typeof SignedS3Response.fields);
     })
-    postData.append('file', file)
-    return await fetch(url, { method: "POST", body: postData })
+    postData.append('file', file);
+    return fetch(url, { method: "POST", body: postData });
 }

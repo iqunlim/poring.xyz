@@ -1,24 +1,166 @@
 .container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    margin: auto;
+    width: 400px;
     height: 100vh;
 }
 
+.container__form {
+    position: relative;
+    padding-top: 1rem;
+    padding-inline: .25rem;
+    background-color: white;
+    color: black;
+    width: 100%;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+}
 
-.file-upload label {
+.mascot {
+    display: block;
+    object-fit: fill;
+    height: 60px;
+    position: absolute;
+}
+
+.angel {
+    top: -45px;
+    right: 50px;
+}
+
+.arch {
+    top: -45px;
+    left: 50px;
+}
+
+.poring {
+    top: -40px;
+    right: 0px;
+}
+
+.poporing {
+    bottom: -10px;
+    left: 0;
+}
+
+.imgpreview {
+    padding-bottom: 1rem;
+    width: 100%;
+    height: auto;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.imgpreview__img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+
+.image__actual {
+    position: relative;
+}
+
+.form {
+    padding: 1rem;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 100%;
+}
+
+.form__upload {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.form__upload>label {
     font-size: 1rem;
     font-weight: 700;
 }
 
-label.blog-img-upload {
+label.form__uploadbutton {
     background-color: inherit;
     border: solid 1px #94a3b8;
-    width: fit-content;
-    color: white;
+    width: 100%;
     padding: 10px 20px;
     font-family: sans-serif;
     border-radius: 50rem;
     cursor: pointer;
     margin-top: 1rem;
+    text-align: center;
+}
+
+label.form__uploadbutton.faded {
+    background-color: #4d4d4d;
+    opacity: 0.5;
+}
+
+.form__uploadchosen {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.imgpreview__img {
+    margin-top: 20px;
+    height: auto;
+    max-height: 500px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.imgpreview__urlbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.imgpreview__urlbox>p {
+    text-wrap: nowrap;
+    overflow: scroll;
+    height: 24px;
+    width: auto;
+    padding-inline: 0.25rem;
+    border: solid 1px #94a3b8;
+    border-radius: 5px;
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.imgpreview__urlbox>p::-webkit-scrollbar {
+    display: none;
+}
+
+.popup {
+    position: absolute;
+    top: -10px;
+    left: 0;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border: 1px solid #94a3b8;
+    border-radius: 10px;
+    opacity: 1;
+    transition: opacity 1s ease-out;
+}
+
+.popup>p {
+    margin: 0;
+    padding-inline: 0.5rem;
+}
+
+.popup.fade-out {
+    opacity: 0;
 }
