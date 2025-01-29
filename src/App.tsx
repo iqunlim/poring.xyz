@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import Mascot from "./components/Mascot"
-import ImageUploadForm from './components/ImageUploadButton';
-import ClipboardButton from './components/Clipboard';
+import { useState } from "react";
+import Mascot from "./components/Mascot";
+import ImageUploadForm from "./components/ImageUploadButton";
+import ClipboardButton from "./components/Clipboard";
 
 function App() {
 

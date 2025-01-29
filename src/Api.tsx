@@ -1,10 +1,28 @@
 import { z, ZodError } from "zod";
 
 //TODO: Explore options to set this on the web server more dynamically.
-const apiUrl = "https://dd0zurzvoj.execute-api.us-east-2.amazonaws.com"
+const apiUrl = "https://dd0zurzvoj.execute-api.us-east-2.amazonaws.com";
 
+
+export class ApiError extends Error {
+    source: string;
+    statusText: string;
+    constructor(source: string, statusText: string, message = "An API error occurred") {
+        super(message);
+        this.source = source;
+        this.statusText = statusText;
+        this.name = "ApiError";
+    }
+
+    toString() {
+        return `[${this.source} ${this.statusText}] ${this.message}`;
+    }
+}
+
+// TODO: Explore input and output types in order to make
+// not all of these optional
 const ApiDataZod = z.object({
-    url: z.string().url(),
+    url: z.string().url().optional(),
     fields: z.object({
         "Content-Type": z.string(),
         key: z.string(),
@@ -14,16 +32,16 @@ const ApiDataZod = z.object({
         "x-amz-security-token": z.string(),
         policy: z.string(),
         "x-amz-signature": z.string(),
-    }),
-    imageUrl: z.string().url(),
+    }).optional(),
+    imageUrl: z.string().url().optional(),
     error: z.string().optional()
 });
 
-export type ApiData = z.infer<typeof ApiDataZod>
+export type ApiData = z.infer<typeof ApiDataZod>;
 
 const validateApiResponse = (ResponseData: unknown) => {
     const parsedData = ApiDataZod.parse(ResponseData);
-    return parsedData
+    return parsedData;
 }
 
 export async function getSignedS3Url(file: File) {
@@ -35,26 +53,29 @@ export async function getSignedS3Url(file: File) {
             if (data.error) {
                 throw new Error(data.error);
             }
-            return data
+            return data;
         }).catch((err) => {
-            //TODO: special logging handlers for each type of error
             if (err instanceof Error) {
                 console.log("Error getting Signed S3 Url");
-                console.error(err);
+                throw new ApiError("setSignedS4Url.ApiReturn", "API Error", err.message);
             } else if (err instanceof ZodError) {
                 console.log("Error validating API response");
-                console.error(err);
+                throw new ApiError("Zod", "Zod Validation error", err.message);
             } else {
-                console.error(`Unknown error: ${err}`);
+                throw new Error(`Unknown: Error: ${err}`);
             }
         });
 }
 
 export async function putSignedS3Object(file: File, SignedS3Response: ApiData, url: string) {
     const postData = new FormData();
-    Object.entries(SignedS3Response.fields).forEach(([key, val]) => {
-        postData.append(key, val as keyof typeof SignedS3Response.fields);
-    })
-    postData.append('file', file);
-    return fetch(url, { method: "POST", body: postData });
+    if (SignedS3Response.fields) {
+        Object.entries(SignedS3Response.fields).forEach(([key, val]) => {
+            postData.append(key, val as keyof typeof SignedS3Response.fields);
+        })
+        postData.append('file', file);
+        return fetch(url, { method: "POST", body: postData });
+    } else {
+        throw new TypeError("SignedS3Response was undefined, expected ApiData");
+    }
 }
