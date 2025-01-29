@@ -14,7 +14,6 @@ export default function ClipboardButton({ text, className }: { text: string, cla
         }).catch((err) => console.error(`Error copying text: ${text} error: ${err.message}`));
     }
 
-
     const handleClipboardClick = (text: string) => {
         if (!showPopup) {
             copyToClipboard(text);

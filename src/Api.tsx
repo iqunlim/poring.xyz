@@ -56,10 +56,8 @@ export async function getSignedS3Url(file: File) {
             return data;
         }).catch((err) => {
             if (err instanceof Error) {
-                console.log("Error getting Signed S3 Url");
                 throw new ApiError("setSignedS4Url.ApiReturn", "API Error", err.message);
             } else if (err instanceof ZodError) {
-                console.log("Error validating API response");
                 throw new ApiError("Zod", "Zod Validation error", err.message);
             } else {
                 throw new Error(`Unknown: Error: ${err}`);

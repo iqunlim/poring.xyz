@@ -3,16 +3,21 @@ import ArchAngeling from "../assets/arch.gif";
 import Poring from "../assets/poring.gif";
 import Poporing from "../assets/poporing-flip.gif";
 
-export type mascotType = "poring" | "poporing" | "angeling" | "archangeling";
+type MascotType = "poring" | "poporing" | "angeling" | "archangeling";
 
-export default function Mascot({ type, className, ...rest }: { type: mascotType, className?: string }) {
+interface MascotProps extends React.ComponentPropsWithoutRef<"img"> {
+    className: string,
+    type: MascotType
+}
+
+export default function Mascot({ type, className, ...rest }: MascotProps) {
 
     return <img {...rest}
         className={`absolute block object-fill h-16 ${className}`}
         src={typeToImg(type)} />
 }
 
-function typeToImg(type: mascotType) {
+function typeToImg(type: MascotType) {
     switch (type) {
         case "poring":
             return Poring;

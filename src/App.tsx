@@ -2,10 +2,40 @@ import { useState } from "react";
 import Mascot from "./components/Mascot";
 import ImageUploadForm from "./components/ImageUploadButton";
 import ClipboardButton from "./components/Clipboard";
+import { ApiError, getSignedS3Url, putSignedS3Object } from "./Api";
 
 function App() {
 
   const [currentFileUrl, setCurrentFileUrl] = useState("");
+
+  /* This is the action that will be run with useActionState within the ImageUploadForm */
+  const action = async (_: string | null | undefined, formData: FormData) => {
+    const file = formData.get("image") as File;
+    if (file) {
+      try {
+        const SignedData = await getSignedS3Url(file);
+        if (SignedData && SignedData.url) {
+          putSignedS3Object(file, SignedData, SignedData.url).then(() => {
+            if (SignedData.imageUrl) {
+              setCurrentFileUrl(SignedData.imageUrl);
+            }
+          })
+          return "Uploaded";
+        } else {
+          return "There was an error. Please try again later";
+        }
+      } catch (error) {
+        if (error instanceof ApiError) {
+          console.error(error.name, error.toString());
+        } else if (error instanceof Error) {
+          console.error(error.name, error.message);
+        }
+        return "There was an error. Please try again later";
+      }
+    } else {
+      return "Please select a file";
+    }
+  }
 
   return (
     <>
@@ -13,7 +43,7 @@ function App() {
         <div className="big-shadow bg-white flex flex-col gap-4 items-center justify-center max-w-full min-w-[300px] px-2 py-4 relative rounded-sm">
           <Mascot type="angeling" className="right-[50px] top-[-45px]" />
           <Mascot type="archangeling" className="left-[50px] top-[-45px]" />
-          <ImageUploadForm currentFileUrl={currentFileUrl} currentFileSetter={setCurrentFileUrl} />
+          <ImageUploadForm formActionFunction={action} />
           {/* When currentFileUrl set from the form, show all of the image information */}
           {currentFileUrl && (
             <>
