@@ -9,7 +9,7 @@ function App() {
   const [fileUrls, setFileUrls] = useState<string[]>([]);
 
   /* This is the action that will be run with useActionState within the ImageUploadForm */
-  const action = async (_: string | null | undefined, formData: FormData) => {
+  const action = async (_: unknown, formData: FormData) => {
     const file = formData.get("image") as File;
     if (file) {
       try {
@@ -47,7 +47,7 @@ function App() {
         <div className="big-shadow bg-white flex flex-col gap-4 items-center justify-center max-w-full min-w-[300px] px-2 py-4 relative rounded-sm">
           <Mascot type="angeling" className="right-[50px] top-[-45px]" />
           <Mascot type="archangeling" className="left-[50px] top-[-45px]" />
-          <ImageUploadForm formActionFunction={action} />
+          <ImageUploadForm className="block font-bold py-2 cursor-pointer text-center rounded-full shadow-md bg-red-200 hover:bg-red-300" formActionFunction={action} paste draganddrop />
           {/* When currentFileUrl set from the form, show all of the image information */}
           {fileUrls.length > 0 && (
             <>
@@ -57,6 +57,7 @@ function App() {
                 <img src={fileUrls[0]} className="max-h-[500px] object-contain" />
               </div>
               {fileUrls.map((url) => <ClipboardButton
+                key={url}
                 text={url}
                 className="bg-red-200 cursor-copy flex gap-1 hover:bg-red-300 items-center no-scrollbar overflow-scroll p-1 relative rounded-md shadow-md text-nowrap w-full"
               />)}

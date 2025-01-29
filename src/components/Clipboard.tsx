@@ -2,7 +2,12 @@ import { useState } from "react";
 import { FaClipboardList } from "react-icons/fa";
 import Popup from "./Popup";
 
-export default function ClipboardButton({ text, className }: { text: string, className: string }) {
+
+interface ClipboardProps extends React.ComponentProps<"div"> {
+    text: string,
+    className: string
+}
+export default function ClipboardButton({ text, className, ...rest }: ClipboardProps) {
 
 
     const [showPopup, setShowPopup] = useState(false);
@@ -29,7 +34,7 @@ export default function ClipboardButton({ text, className }: { text: string, cla
     }
 
     return (
-        <div onClick={() => handleClipboardClick(text)} className={className}>
+        <div {...rest} onClick={() => handleClipboardClick(text)} className={className}>
             <Popup show={showPopup} fadeout={fadeOut} message="Copied to clipboard!" />
             <span>
                 <FaClipboardList />
