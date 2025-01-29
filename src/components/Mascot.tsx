@@ -5,15 +5,14 @@ import Poporing from "../assets/poporing-flip.gif";
 
 type MascotType = "poring" | "poporing" | "angeling" | "archangeling";
 
-interface MascotProps extends React.ComponentPropsWithoutRef<"img"> {
-    className: string,
+interface MascotProps extends React.ComponentProps<"img"> {
     type: MascotType
 }
 
 export default function Mascot({ type, className, ...rest }: MascotProps) {
 
     return <img {...rest}
-        className={`absolute block object-fill h-16 ${className}`}
+        className={`absolute block object-fill h-16 ${className ? className : ""}`}
         src={typeToImg(type)} />
 }
 
@@ -28,6 +27,6 @@ function typeToImg(type: MascotType) {
         case "archangeling":
             return ArchAngeling;
         default:
-            throw new TypeError("TypeError: value was not in mascotType");
+            throw new TypeError("TypeError: value was not in MascotType");
     }
 }
