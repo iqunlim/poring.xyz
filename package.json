@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.0",
+    "@vercel/analytics": "^1.4.1",
     "mime": "^4.0.6",
     "mime-types": "^2.1.35",
     "react": "19.0.0",

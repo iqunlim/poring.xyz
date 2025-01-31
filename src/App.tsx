@@ -3,7 +3,7 @@ import Mascot from "./components/Mascot";
 import ImageUploadForm from "./components/ImageUploadForm";
 import ClipboardButton from "./components/Clipboard";
 import { ApiError, getSignedS3Url, putSignedS3Object } from "./Api";
-
+import { Analytics } from "@vercel/analytics/react"
 function App() {
 
   const [fileUrls, setFileUrls] = useState<string[]>([]);
@@ -43,6 +43,7 @@ function App() {
 
   return (
     <>
+      <Analytics />
       <div className="flex flex-col h-screen items-center justify-center m-auto max-w-[40%]">
         <div className="big-shadow bg-white flex flex-col gap-4 items-center justify-center max-w-full min-w-[300px] px-2 py-4 relative rounded-sm">
           <Mascot type="angeling" className="right-[50px] top-[-45px]" />
