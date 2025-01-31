@@ -9,8 +9,6 @@ Welcome to the front-end to [My S3-based Image Uploader!](https://files.iqun.xyz
 `npm run dev` to run in developer mode
 `npm run build` to build the project in to a distributatble format
 
-```
-
 ## Features
 
 ![Gif of a poring](https://files.iqun.xyz/GMZ6TTB4ET0B/poring.gif)
@@ -69,4 +67,7 @@ Additional functionality such as logins and file tracking.
 ### License
 
 Both the terraform and the front end are licensed under GPL-3
+
+```
+
 ```
