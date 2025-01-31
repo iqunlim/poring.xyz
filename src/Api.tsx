@@ -1,5 +1,14 @@
 import { z, ZodError } from "zod";
 
+//https://1266e8da.poring-xyz-api.pages.dev
+// {"url":"https://poring-xyz.3b9d8722675c71bf1d27b15c1cbc2913.r2.cloudflarestorage.com/
+// test.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD
+// &X-Amz-Credential=2d26590b2e5bd60c0837b5faa2f7a744%2F20250131%2Fauto%2Fs3%2Faws4_request
+// &X-Amz-Date=20250131T070445Z&X-Amz-Expires=3600&X-Amz-Signature=eff67f354e68c1cd66cec38af9dcafbabbf942a21c6a4dcad49ac180a1b0da47
+// &X-Amz-SignedHeaders=content-length%3Bhost&x-amz-checksum-crc32=AAAAAA%3D%3D&x-amz-sdk-checksum-algorithm=CRC32
+// &x-id=PutObject","imageUrl":"https://files2.iqun.xyz/test.png","error":""}
+
+
 const apiUrl = import.meta.env.VITE_API_URL
 
 if (!apiUrl) {
@@ -47,8 +56,9 @@ const validateApiResponse = (ResponseData: unknown) => {
     return parsedData;
 }
 
+// These two functions can be used for S3 uploading securely. The new API uses R2.
 export async function getSignedS3Url(file: File) {
-    const url = `${apiUrl}/v1/sign-s3?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}&t=${file.size}`;
+    const url = `${apiUrl}?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}&t=${file.size}`;
     return fetch(url)
         .then(data => data.json())
         .then(validateApiResponse)
@@ -74,9 +84,22 @@ export async function putSignedS3Object(file: File, SignedS3Response: ApiData, u
         Object.entries(SignedS3Response.fields).forEach(([key, val]) => {
             postData.append(key, val as keyof typeof SignedS3Response.fields);
         })
-        postData.append('file', file);
-        return fetch(url, { method: "POST", body: postData });
     } else {
-        throw new TypeError("SignedS3Response was undefined, expected ApiData");
+        console.debug("putSignedS3Object: No fields in response, skipping");
     }
+    postData.append('file', file);
+    return fetch(url, { method: "POST", body: postData });
+}
+
+// In the new API, we can simply POST the file.
+// However, the API has a max limit of 100MB files.
+export async function putR2Object(file: File) {
+    const url = `${apiUrl}?fileName=${encodeURIComponent(file.name)}&fileType=${encodeURIComponent(file.type)}`;
+    if (!file) {
+        throw new Error("No file provided");
+    }
+    const postData = new FormData();
+    postData.append('file', file);
+    postData.append("test", "Testing")
+    return fetch(url, { method: "POST", body: postData }).then(data => data.json()).then(validateApiResponse);
 }

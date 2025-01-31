@@ -2,7 +2,7 @@ import { useState } from "react";
 import Mascot from "./components/Mascot";
 import ImageUploadForm from "./components/ImageUploadForm";
 import ClipboardButton from "./components/Clipboard";
-import { ApiError, getSignedS3Url, putSignedS3Object } from "./Api";
+import { ApiError, putR2Object } from "./Api";
 import { Analytics } from "@vercel/analytics/react"
 function App() {
 
@@ -13,21 +13,28 @@ function App() {
     const file = formData.get("image") as File;
     if (file) {
       try {
-        const SignedData = await getSignedS3Url(file);
-        if (SignedData && SignedData.url) {
-          putSignedS3Object(file, SignedData, SignedData.url).then(() => {
-            setFileUrls(prev => {
-              if (SignedData.imageUrl) {
-                return [SignedData.imageUrl, ...prev];
-              }
-              return prev
-            }
-            );
-          })
-          return "Uploaded";
+
+        // const SignedData = await getSignedS3Url(file);
+        // if (SignedData && SignedData.url) {
+        //   putSignedS3Object(file, SignedData, SignedData.url).then(() => {
+        //     setFileUrls(prev => {
+        //       if (SignedData.imageUrl) {
+        //         return [SignedData.imageUrl, ...prev];
+        //       }
+        //       return prev
+        //     }
+        //     );
+        //   })
+        const res = await putR2Object(file)
+        if (res.error) {
+          throw new ApiError("putR2Object", "R2 Object Threw an error", res.error)
         } else {
-          return "There was an error. Please try again later";
+          if (!res.imageUrl) {
+            throw new ApiError("putR2Object", "API did not return an image URL", res.imageUrl)
+          }
+          setFileUrls(prev => [res.imageUrl as string, ...prev])
         }
+        return "Uploaded";
       } catch (error) {
         if (error instanceof ApiError) {
           console.error(error.name, error.toString());
