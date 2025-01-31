@@ -1,7 +1,10 @@
 import { z, ZodError } from "zod";
 
-//TODO: Explore options to set this on the web server more dynamically.
-const apiUrl = "https://dd0zurzvoj.execute-api.us-east-2.amazonaws.com";
+const apiUrl = import.meta.env.VITE_API_URL
+
+if (!apiUrl) {
+    throw new Error("VITE_API_URL is not defined");
+}
 
 
 export class ApiError extends Error {

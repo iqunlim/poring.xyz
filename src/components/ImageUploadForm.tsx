@@ -23,7 +23,7 @@ export default function ImageUploadForm(props: ImageUploadProps, ...rest: Omitte
     * Add support for multiple files
     */
 
-    const { formActionFunction, style, allowpaste = false, autosubmit = true, accept = "images/*", children } = props;
+    const { formActionFunction, style, allowpaste = false, autosubmit = true, accept = "images/*" } = props;
     const [alreadyUploaded, setAlreadyUploaded] = useState(false); // A simple boolean to display "Another" on the button
     const [hovering, setHovering] = useState(false);
     const [actionState, formAction, isPending] = useActionState(formActionFunction, null); // React 19 form action function
@@ -154,7 +154,7 @@ export default function ImageUploadForm(props: ImageUploadProps, ...rest: Omitte
 
                     </>
                 }
-                {children}
+                {props.children}
             </form>
         </>
     )
