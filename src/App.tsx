@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Mascot from "./components/Mascot";
-import ImageUploadForm from "./components/ImageUploadButton";
+import ImageUploadForm from "./components/ImageUploadForm";
 import ClipboardButton from "./components/Clipboard";
 import { ApiError, getSignedS3Url, putSignedS3Object } from "./Api";
 
@@ -47,7 +47,7 @@ function App() {
         <div className="big-shadow bg-white flex flex-col gap-4 items-center justify-center max-w-full min-w-[300px] px-2 py-4 relative rounded-sm">
           <Mascot type="angeling" className="right-[50px] top-[-45px]" />
           <Mascot type="archangeling" className="left-[50px] top-[-45px]" />
-          <ImageUploadForm className="block font-bold py-2 cursor-pointer text-center rounded-full shadow-md bg-red-200 hover:bg-red-300" formActionFunction={action} paste draganddrop />
+          <ImageUploadForm className="block font-bold py-2 cursor-pointer text-center rounded-full shadow-md bg-red-200 hover:bg-red-300" formActionFunction={action} allowpaste />
           {/* When currentFileUrl set from the form, show all of the image information */}
           {fileUrls.length > 0 && (
             <>
