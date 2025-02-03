@@ -67,7 +67,7 @@ function App() {
           <FileUploadForm className="block font-bold py-2 cursor-pointer text-center rounded-full shadow-md bg-red-200 hover:bg-red-300" formActionFunction={action} allowpaste />
 
           {/* Show image preview when its an image*/}
-          {fileData[0].fileType.match(/image\/\w+/i) !== null && (
+          {fileData.length > 0 && fileData[0].fileType.match(/image\/\w+/i) !== null && (
             <div className="flex justify-center relative w-full">
               <Mascot type="poring" className="right-0 top-[-40px]" />
               <Mascot type="poporing" className="bottom-[-10px] left-0" />
