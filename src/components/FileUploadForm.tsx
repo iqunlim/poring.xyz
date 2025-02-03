@@ -1,5 +1,6 @@
 import React, { useActionState, useEffect, useRef, useState } from "react";
 import mime from "mime"; // TODO: Remove and replace with our own function
+import { excludedMimeTypes } from "../Api";
 
 // A type to exclude the the properties of an input element that we have already set below and do not want changed
 type OmittedProps = Omit<React.ComponentPropsWithoutRef<"input">, "onChange" | "hidden" | "type" | "id" | "name" | "disabled">
@@ -10,6 +11,8 @@ interface ImageUploadProps extends OmittedProps {
     autosubmit?: boolean,
 }
 
+
+
 /**
  * A (WIP) full featured Image Uploader button that includes listeners for drag and drop and clipboard paste with ctrl+v
  * Defaults to only accepting image files, pass in an accept prop to change this
@@ -17,13 +20,14 @@ interface ImageUploadProps extends OmittedProps {
  * @params paste: Enables using CTRL+V to paste files from the keyboard. Defaults to false
  * @params autosubmit: Automatically submits the form when a file is selected. If set to false, you must provide a submit button. Defaults to true
  */
-export default function ImageUploadForm(props: ImageUploadProps, ...rest: OmittedProps[]) {
+export default function FileUploadForm(props: ImageUploadProps, ...rest: OmittedProps[]) {
 
     /*TODOs:
     * Add support for multiple files
+    * Add support for new file types
     */
 
-    const { formActionFunction, style, allowpaste = false, autosubmit = true, accept = "images/*" } = props;
+    const { formActionFunction, style, allowpaste = false, autosubmit = true } = props;
     const [alreadyUploaded, setAlreadyUploaded] = useState(false); // A simple boolean to display "Another" on the button
     const [hovering, setHovering] = useState(false);
     const [actionState, formAction, isPending] = useActionState(formActionFunction, null); // React 19 form action function
@@ -51,7 +55,7 @@ export default function ImageUploadForm(props: ImageUploadProps, ...rest: Omitte
         console.debug("ImageUpload DnD: Drop")
         if (e?.dataTransfer?.items && e?.dataTransfer.items.length === 1) {
             const file = e.dataTransfer.items[0].getAsFile();
-            if (file && file.type.match(/image\/\w+/i)) {
+            if (file && !excludedMimeTypes.includes(file.type)) {
                 try {
                     addFileToInputElement(file, autosubmit);
                 } catch (err) {
@@ -60,6 +64,9 @@ export default function ImageUploadForm(props: ImageUploadProps, ...rest: Omitte
                     }
                 }
                 return;
+            } else {
+                // TODO: Do something more visual here
+                console.error("ImageUpload DnD Error: File type not compatible")
             }
         }
     }
@@ -140,8 +147,8 @@ export default function ImageUploadForm(props: ImageUploadProps, ...rest: Omitte
                 {isPending && <h2 className="text-2xl font-bold">Uploading...</h2>}
                 <h1 className="text-3xl font-bold">{actionState ? actionState : "Choose a file..."}</h1>
                 {/* The input type=file is hidden and the label is styled with className */}
-                <input {...rest} ref={inputRef} type="file" id="img" name="image" accept={accept} onChange={handleFileChange} hidden disabled={isPending} />
-                <label style={style} htmlFor="img" className={`${props.className} ${isPending ? "bg-slate-800 hover:bg-slate-800 z-20 opacity-50" : ""}`}>{`Upload ${alreadyUploaded ? "Another" : ""} Image`}</label>
+                <input {...rest} ref={inputRef} type="file" id="img" name="image" onChange={handleFileChange} hidden disabled={isPending} />
+                <label style={style} htmlFor="img" className={`${props.className} ${isPending ? "bg-slate-800 hover:bg-slate-800 z-20 opacity-50" : ""}`}>{`Upload ${alreadyUploaded ? "Another" : ""} File`}</label>
                 {/* Visible drag and drop functionality */}
                 {hovering &&
                     <>

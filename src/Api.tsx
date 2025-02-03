@@ -7,7 +7,32 @@ import { z, ZodError } from "zod";
 // &X-Amz-Date=20250131T070445Z&X-Amz-Expires=3600&X-Amz-Signature=eff67f354e68c1cd66cec38af9dcafbabbf942a21c6a4dcad49ac180a1b0da47
 // &X-Amz-SignedHeaders=content-length%3Bhost&x-amz-checksum-crc32=AAAAAA%3D%3D&x-amz-sdk-checksum-algorithm=CRC32
 // &x-id=PutObject","imageUrl":"https://files2.iqun.xyz/test.png","error":""}
+// General Typically excluded MIME types for file upload applications
 
+export const excludedMimeTypes = [
+    "application/x-msdownload", // .exe, .dll
+    "application/x-sh", // .sh
+    "application/x-bat", // .bat
+    "application/x-msdos-program", // .com
+    "application/x-python", // .py
+    "application/x-php", // .php
+    "application/x-perl", // .pl
+    "application/x-java-archive", // .jar
+    "application/x-ms-shortcut", // .lnk
+    "application/x-msdos-windows", // .sys
+    "application/x-msdos-program", // .drv
+    "application/x-msi", // .msi, .msp
+    "application/octet-stream", // generic binary files
+    "text/x-shellscript", // .sh, .bash
+    "application/json", // sometimes restricted due to API security concerns
+    "application/x-dosexec", // Windows executable binaries
+    "application/x-httpd-php", // .php
+    "text/html", // .html, .htm (to prevent phishing attempts)
+    "application/javascript", // .js
+    "application/x-java", // .class
+    "application/iso", // .iso
+    "application/x-bittorrent" // .torrent
+];
 
 const apiUrl = import.meta.env.VITE_API_URL
 
@@ -45,7 +70,7 @@ const ApiDataZod = z.object({
         policy: z.string(),
         "x-amz-signature": z.string(),
     }).optional(),
-    imageUrl: z.string().url().optional(),
+    fileUrl: z.string().url().optional(),
     error: z.string().optional()
 });
 
