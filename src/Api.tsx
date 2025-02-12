@@ -1,14 +1,5 @@
 import { z, ZodError } from "zod";
 
-//https://1266e8da.poring-xyz-api.pages.dev
-// {"url":"https://poring-xyz.3b9d8722675c71bf1d27b15c1cbc2913.r2.cloudflarestorage.com/
-// test.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD
-// &X-Amz-Credential=2d26590b2e5bd60c0837b5faa2f7a744%2F20250131%2Fauto%2Fs3%2Faws4_request
-// &X-Amz-Date=20250131T070445Z&X-Amz-Expires=3600&X-Amz-Signature=eff67f354e68c1cd66cec38af9dcafbabbf942a21c6a4dcad49ac180a1b0da47
-// &X-Amz-SignedHeaders=content-length%3Bhost&x-amz-checksum-crc32=AAAAAA%3D%3D&x-amz-sdk-checksum-algorithm=CRC32
-// &x-id=PutObject","imageUrl":"https://files2.iqun.xyz/test.png","error":""}
-// General Typically excluded MIME types for file upload applications
-
 export const excludedMimeTypes = [
     "application/x-msdownload", // .exe, .dll
     "application/x-sh", // .sh
