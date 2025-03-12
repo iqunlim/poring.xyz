@@ -1,6 +1,6 @@
 # Poring.xyz
 
-Welcome to the front-end to [My S3-based Image Uploader!](https://files.iqun.xyz)
+Welcome to the front-end to [My S3-based Image Uploader!](https://poring.xyz)
 
 ## Installation instructions
 
