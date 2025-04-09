@@ -4,7 +4,7 @@ import FileUploadForm from "./components/FileUploadForm";
 import ClipboardButton from "./components/Clipboard";
 import { ApiError, putR2Object } from "./Api";
 import { Analytics } from "@vercel/analytics/react";
-import logo from "./assets/logo2.png";
+import logo from "./assets/logo2.webp";
 
 type fileData = {
   fileUrl: string;
